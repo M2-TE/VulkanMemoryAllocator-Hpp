@@ -32,19 +32,36 @@ if (VMA_HPP_ENABLE_VULKAN_HPP_MODULE)
     target_compile_definitions(VulkanMemoryAllocator-Hpp INTERFACE "VMA_ENABLE_VULKAN_HPP_MODULE")
 endif()
 
-# check if VulkanMemoryAllocator target is missing
-if (NOT TARGET GPUOpen::VulkanMemoryAllocator)
-    if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/VulkanMemoryAllocator/include")
-        # add via submodule if pulled
-        add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/VulkanMemoryAllocator")
-    else()
-        # use FindPackage as a last resort
-        find_package(VulkanMemoryAllocator CONFIG REQUIRED)
-    endif()
-    # TODO: could employ FetchContent as another fallback
+# check for VulkanMemoryAllocator
+if (TARGET GPUOpen::VulkanMemoryAllocator)
+    # use existing target
+    target_link_libraries(VulkanMemoryAllocator-Hpp INTERFACE GPUOpen::VulkanMemoryAllocator)
+elseif (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/VulkanMemoryAllocator/include")
+    # use git submodule
+    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/VulkanMemoryAllocator")
+    target_link_libraries(VulkanMemoryAllocator-Hpp INTERFACE GPUOpen::VulkanMemoryAllocator)
+else()
+    # use FindPackage
+    find_package(VulkanMemoryAllocator CONFIG REQUIRED)
+    target_link_libraries(VulkanMemoryAllocator-Hpp INTERFACE GPUOpen::VulkanMemoryAllocator)
 endif()
-# link to VulkanMemoryAllocator
-target_link_libraries(VulkanMemoryAllocator-Hpp INTERFACE GPUOpen::VulkanMemoryAllocator)
+
+# check for Vulkan-Headers
+if (TARGET Vulkan::Headers)
+    # use existing target    
+    target_link_libraries(VulkanMemoryAllocator-Hpp INTERFACE Vulkan::Headers)
+elseif (IS_DIRECTORY Vulkan_INCLUDE_DIRS)
+    # use existing include dirs instead of explicit target
+    target_include_directories(VulkanMemoryAllocator-Hpp INTERFACE ${Vulkan_INCLUDE_DIRS})
+elseif (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Vulkan-Headers/include")
+    # use git submodule
+    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Vulkan-Headers")
+    target_link_libraries(VulkanMemoryAllocator-Hpp INTERFACE Vulkan::Headers)
+else()
+    # use FindPackage
+    find_package(Vulkan REQUIRED)
+    target_link_libraries(VulkanMemoryAllocator-Hpp INTERFACE Vulkan::Headers)
+endif()
 
 # create c++20 module target
 if (VMA_HPP_ENABLE_MODULE)
