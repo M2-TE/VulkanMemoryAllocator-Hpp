@@ -26,10 +26,10 @@ target_include_directories(VulkanMemoryAllocator-Hpp INTERFACE $<BUILD_INTERFACE
 
 # set up compile definitions
 if (VMA_HPP_ENABLE_VULKAN_HPP_MODULE)
-    target_compile_definitions(VulkanMemoryAllocator-Hpp PUBLIC "VK_NO_PROTOTYPES=1")
+    target_compile_definitions(VulkanMemoryAllocator-Hpp INTERFACE "VK_NO_PROTOTYPES=1")
 endif()
 if (VMA_HPP_ENABLE_VULKAN_HPP_DYNAMIC)
-    target_compile_definitions(VulkanMemoryAllocator-Hpp PUBLIC "VMA_ENABLE_VULKAN_HPP_MODULE")
+    target_compile_definitions(VulkanMemoryAllocator-Hpp INTERFACE "VMA_ENABLE_VULKAN_HPP_MODULE")
 endif()
 
 # create c++20 module target
