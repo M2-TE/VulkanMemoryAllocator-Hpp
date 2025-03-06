@@ -60,7 +60,7 @@ if (VMA_HPP_ENABLE_MODULE)
         set_target_properties(VulkanMemoryAllocator-HppModule PROPERTIES
             CXX_STANDARD_REQUIRED ON # CXX version is a hard requirement for modules
             CXX_EXTENSIONS OFF) # Clang's module support can be broken with extensions enabled
-        target_link_libraries(VulkanMemoryAllocator-HppModule PUBLIC Vulkan::Headers)
+        target_link_libraries(VulkanMemoryAllocator-HppModule PUBLIC VulkanMemoryAllocator::Hpp)
 
         # set up CXX standard
         if (VMA_HPP_ENABLE_MODULE_STD)
