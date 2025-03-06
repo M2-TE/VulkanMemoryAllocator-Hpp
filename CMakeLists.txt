@@ -25,12 +25,26 @@ add_library(VulkanMemoryAllocator::Hpp ALIAS VulkanMemoryAllocator-Hpp) # more c
 target_include_directories(VulkanMemoryAllocator-Hpp INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
 # set up compile definitions
-if (VMA_HPP_ENABLE_VULKAN_HPP_MODULE)
+if (VMA_HPP_ENABLE_VULKAN_HPP_DYNAMIC)
     target_compile_definitions(VulkanMemoryAllocator-Hpp INTERFACE "VK_NO_PROTOTYPES=1")
 endif()
-if (VMA_HPP_ENABLE_VULKAN_HPP_DYNAMIC)
+if (VMA_HPP_ENABLE_VULKAN_HPP_MODULE)
     target_compile_definitions(VulkanMemoryAllocator-Hpp INTERFACE "VMA_ENABLE_VULKAN_HPP_MODULE")
 endif()
+
+# check if VulkanMemoryAllocator target is missing
+if (NOT TARGET GPUOpen::VulkanMemoryAllocator)
+    if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/VulkanMemoryAllocator/include")
+        # add via submodule if pulled
+        add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/VulkanMemoryAllocator")
+    else()
+        # use FindPackage as a last resort
+        find_package(VulkanMemoryAllocator CONFIG REQUIRED)
+    endif()
+    # TODO: could employ FetchContent as another fallback
+endif()
+# link to VulkanMemoryAllocator
+target_link_libraries(VulkanMemoryAllocator-Hpp INTERFACE GPUOpen::VulkanMemoryAllocator)
 
 # create c++20 module target
 if (VMA_HPP_ENABLE_MODULE)
